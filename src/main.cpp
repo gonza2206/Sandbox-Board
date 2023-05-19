@@ -32,8 +32,8 @@ void loop()
 {
   strip.setPixelColor(4, 255, 0, 0); // establece el color del LED en rojo
   strip.show();                      // muestra el color en el LED
-  delay(500);
+  delay(400);
   strip.setPixelColor(4, 0, 0, 0); // establece el color del LED en rojo
   strip.show();                      // muestra el color en el LED
-  delay(500);
+  delay(400);
 }
