@@ -26,7 +26,7 @@ void setup()
   strip.setPixelColor(2, 255, 255, 255); // establece el color del LED en rojo
   strip.setPixelColor(5, 255, 255, 255); // establece el color del LED en rojo
   strip.setPixelColor(8, 255, 255, 255); // establece el color del LED en rojo
-  strip.setBrightness(125);
+  strip.setBrightness(255);
   strip.show();                      // muestra el color en el LED
 }
 
