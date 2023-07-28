@@ -13,27 +13,33 @@ void setup()
   {
     strip.setPixelColor(i, 255, 100, 0); // establece el color del LED en rojo
     strip.show();                        // muestra el color en el LED
+    
     delay(500);                          // espera 500ms
   }
-  strip.setPixelColor(0, 0, 100, 0); // establece el color del LED en rojo
-  strip.setPixelColor(3, 0, 100, 0); // establece el color del LED en rojo
-  strip.setPixelColor(6, 0, 100, 0); // establece el color del LED en rojo
+  strip.setPixelColor(0, 255, 255, 255); // establece el color del LED en rojo
+  strip.setPixelColor(3, 255, 255, 255); // establece el color del LED en rojo
+  strip.setPixelColor(6, 255, 255, 255); // establece el color del LED en rojo
+ strip.setPixelColor(4, 255, 255, 255);
+  strip.setPixelColor(1, 255, 255, 255); // establece el color del LED en rojo
+  strip.setPixelColor(7, 255, 255, 255); // establece el color del LED en rojo
 
-  strip.setPixelColor(1, 0, 0, 255); // establece el color del LED en rojo
-  strip.setPixelColor(7, 0, 0, 255); // establece el color del LED en rojo
-
-  strip.setPixelColor(2, 0, 100, 0); // establece el color del LED en rojo
-  strip.setPixelColor(5, 0, 100, 0); // establece el color del LED en rojo
-  strip.setPixelColor(8, 0, 100, 0); // establece el color del LED en rojo
+  strip.setPixelColor(2, 255, 255, 255); // establece el color del LED en rojo
+  strip.setPixelColor(5, 255, 255, 255); // establece el color del LED en rojo
+  strip.setPixelColor(8, 255, 255, 255); // establece el color del LED en rojo
+  strip.setBrightness(125);
   strip.show();                      // muestra el color en el LED
 }
 
 void loop()
 {
-  strip.setPixelColor(4, 255, 0, 0); // establece el color del LED en rojo
-  strip.show();                      // muestra el color en el LED
-  delay(400);
-  strip.setPixelColor(4, 0, 0, 0); // establece el color del LED en rojo
-  strip.show();                      // muestra el color en el LED
-  delay(400);
+  // strip.setPixelColor(4, 255, 0, 0); // establece el color del LED en rojo
+  // strip.show();                      // muestra el color en el LED
+  // delay(400);
+  // strip.setPixelColor(4, 0, 0, 0); // establece el color del LED en rojo
+  // strip.show();                      // muestra el color en el LED
+  // delay(400);
+
 }
+
+
+
