@@ -1,35 +1,34 @@
 #include <Adafruit_NeoPixel.h>
-#include <Mux.h>
+#include "MuxController.hpp"
 
 #define LED_PIN 0  // define el pin donde está conectado el LED
 #define NUM_LEDS 2 // número de LEDs que vamos a usar
-
-#define S0 27  // Conectar al pin S0 del HP4067
-#define S1 26  // Conectar al pin S1 del HP4067
-#define S2 25  // Conectar al pin S2 del HP4067
-#define S3 23  // Conectar al pin S3 del HP4067
-#define SIG 32 // Conectar al pin SIG del HP4067
+#define COL_SIG 32
+#define ROW_SIG 21
+#define BIT_SIG 34
 
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-void selectChannel(uint8_t channel)
-{
-  if (channel < 0 || channel > 15)
-    return; // Canal inválido
-  digitalWrite(S0, (channel & 0b0001) ? HIGH : LOW);
-  digitalWrite(S1, (channel & 0b0010) ? HIGH : LOW);
-  digitalWrite(S2, (channel & 0b0100) ? HIGH : LOW);
-  digitalWrite(S3, (channel & 0b1000) ? HIGH : LOW);
-}
-
 void setup()
 {
-  
-  pinMode(S0, OUTPUT);
-  pinMode(S1, OUTPUT);
-  pinMode(S2, OUTPUT);
-  pinMode(S3, OUTPUT);
-  pinMode(SIG, INPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
+  // column Mux
+  pinMode(27, OUTPUT);
+  pinMode(26, OUTPUT);
+  pinMode(25, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(COL_SIG, OUTPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
+  // Row Mux
+  pinMode(15, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(0, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(ROW_SIG, OUTPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
+  // Bit Mux
+  pinMode(17, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
+  pinMode(BIT_SIG, INPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
   Serial.begin(115200);
 
   strip.begin(); // inicializa la tira de LEDs
@@ -57,14 +56,19 @@ void setup()
 
 void loop()
 {
-  for (uint8_t i = 0; i < 16; i++)
+  static uint8_t channel = 0;
+  row_mux.write(channel);
+  for (byte ctrl_pin = 0; ctrl_pin < 3; ctrl_pin++)
   {
-    selectChannel(i);
-    int value = analogRead(SIG); // Lee el valor analógico del canal seleccionado
-    Serial.print("Leyendo canal ");
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.println(value);
-    delay(300);
+    Serial.printf("**********Fila: %i**************\nColumna: %i\n",channel,ctrl_pin);
+    ctrl_mux.write(ctrl_pin);
+    bit_mux.read();
+    Serial.print("\n");
   }
+  channel++;
+  if (channel>3)
+  {
+    channel = 0;
+  } 
+  delay(1000);
 }
