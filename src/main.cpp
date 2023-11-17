@@ -1,74 +1,71 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <EEPROM_24LC32A_I2C.h>
+#include <MuxController.hpp>
 #include <Adafruit_NeoPixel.h>
-#include "MuxController.hpp"
 
-#define LED_PIN 0  // define el pin donde está conectado el LED
-#define NUM_LEDS 2 // número de LEDs que vamos a usar
-#define COL_SIG 32
-#define ROW_SIG 21
-#define BIT_SIG 34
+#define PIN            4  // Pin al que están conectados los LEDs WS2812B
+#define NUM_LEDS       30  // Número de LEDs en la tira
 
-Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
+
+#define s0_gnd 14
+#define sig_gnd 25
+#define sig_vcc 26
+#define s0_vcc 27
+EEPROM_24LC32A_I2C gamePiece(0x50);
+
+// Función para llenar toda la tira con un color sólido
+void colorWipe(uint32_t color, int wait) {
+  for(int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+    strip.show();
+    delay(wait);
+  }
+}
 void setup()
 {
-  // column Mux
-  pinMode(27, OUTPUT);
-  pinMode(26, OUTPUT);
-  pinMode(25, OUTPUT);
-  pinMode(23, OUTPUT);
-  pinMode(COL_SIG, OUTPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
-  // Row Mux
-  pinMode(15, OUTPUT);
-  pinMode(2, OUTPUT);
-  pinMode(0, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(ROW_SIG, OUTPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
-  // Bit Mux
-  pinMode(17, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(18, OUTPUT);
-  pinMode(19, OUTPUT);
-  pinMode(BIT_SIG, INPUT); // Si deseas escribir en un canal, cambia esto a OUTPUT
-  Serial.begin(115200);
 
-  strip.begin(); // inicializa la tira de LEDs
-  strip.show();  // asegurarse de que los LEDs estén apagados al inicio
-  for (int i = 0; i < NUM_LEDS; i++)
-  {
-    strip.setPixelColor(i, 255, 100, 0); // establece el color del LED en rojo
-    strip.show();                        // muestra el color en el LED
+  // pinMode(s0_gnd, OUTPUT);
+  // pinMode(sig_gnd, OUTPUT);
+  // pinMode(sig_vcc, OUTPUT);
+  // pinMode(s0_vcc, OUTPUT);
 
-    delay(500); // espera 500ms
-  }
-  strip.setPixelColor(0, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(3, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(6, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(4, 255, 255, 255);
-  strip.setPixelColor(1, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(7, 255, 255, 255); // establece el color del LED en rojo
-
-  strip.setPixelColor(2, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(5, 255, 255, 255); // establece el color del LED en rojo
-  strip.setPixelColor(8, 255, 255, 255); // establece el color del LED en rojo
-  strip.setBrightness(255);
-  strip.show(); // muestra el color en el LED
+  // Serial.begin(115200);
+  // Wire.begin(); // Iniciar la comunicación I2C
+  // char str_data[] = {"DOS"};
+  // // eprom.write(0,str_data);
+  //  //gamePiece.writeEEPROM(0,str_data);
+  // // vcc_mux.write(0, HIGH);
+  // delay(100);
+  // digitalWrite(sig_gnd, HIGH); // Configura el pin 23 en HIGH
+  // digitalWrite(s0_gnd, HIGH); // Configura el pin 26 en HIGH
+  // gamePiece.readDataFromEEPROM();
+    strip.begin();
+  strip.show();  // Inicializa todos los LEDs en apagado
 }
 
 void loop()
 {
-  static uint8_t channel = 0;
-  row_mux.write(channel);
-  for (byte ctrl_pin = 0; ctrl_pin < 3; ctrl_pin++)
-  {
-    Serial.printf("**********Fila: %i**************\nColumna: %i\n",channel,ctrl_pin);
-    ctrl_mux.write(ctrl_pin);
-    bit_mux.read();
-    Serial.print("\n");
-  }
-  channel++;
-  if (channel>3)
-  {
-    channel = 0;
-  } 
-  delay(1000);
+    // Ejemplo de cambio de color en todos los LEDs
+  colorWipe(strip.Color(255, 0, 0), 50);  // Rojo
+  delay(500);
+  colorWipe(strip.Color(0, 255, 0), 50);  // Verde
+  delay(500);
+  colorWipe(strip.Color(0, 0, 255), 50);  // Azul
+  delay(500);
+  // //Activamos la columna 0 del mux gnd
+  // digitalWrite(s0_vcc, LOW);
+  // //Energizamos la columna 0 
+  // digitalWrite(sig_vcc, HIGH);
+  // delay(2000);
+  // gamePiece.readDataFromEEPROM();
+  // digitalWrite(sig_vcc, LOW);
+  // //Activamos la columna 1 del mux gnd
+  // digitalWrite(s0_vcc, HIGH);
+  // digitalWrite(sig_vcc, HIGH);
+  // delay(2000);
+  // gamePiece.readDataFromEEPROM(); //LEEMOS otra EEPROM
+  // delay(2000);
 }
