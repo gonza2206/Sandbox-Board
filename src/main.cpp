@@ -4,68 +4,107 @@
 #include <MuxController.hpp>
 #include <Adafruit_NeoPixel.h>
 
-#define PIN            4  // Pin al que están conectados los LEDs WS2812B
-#define NUM_LEDS       30  // Número de LEDs en la tira
+#define PIN 13          // Pin al que están conectados los LEDs WS2812B
+#define NUM_LEDS 30     // Número de LEDs en la tira
+#define NUM_REGISTERS 2 // Número de registros en cascada (puedes ajustarlo según tu configuración)
+
+int latchPin = 14; // pin D8 on NodeMCU boards
+int clockPin = 0;  // pin D3 on NodeMCU boards
+int dataPin = 12;  // pin D7 on NodeMCU
+uint8_t leds = 0;  // Variable to hold the pattern of which LEDs are currently turned on or off
+
+int numOfRegisters = 2;
+uint8_t *registerState;
+
+long effectId = 0;
+long prevEffect = 0;
+long effectRepeat = 0;
+long effectSpeed = 30;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
-
-#define s0_gnd 14
-#define sig_gnd 25
-#define sig_vcc 26
-#define s0_vcc 27
 EEPROM_24LC32A_I2C gamePiece(0x50);
 
 // Función para llenar toda la tira con un color sólido
-void colorWipe(uint32_t color, int wait) {
-  for(int i = 0; i < strip.numPixels(); i++) {
+void colorWipe(uint32_t color, int wait)
+{
+  for (int i = 0; i < strip.numPixels(); i++)
+  {
     strip.setPixelColor(i, color);
     strip.show();
     delay(wait);
   }
 }
+
+void regWrite(int pin, bool state)
+{
+  int reg = pin / 8;               // Determines register
+  int actualPin = pin - (8 * reg); // Determines pin for actual register
+  digitalWrite(latchPin, LOW);     // Begin session
+  for (int i = 0; i < numOfRegisters; i++)
+  {
+    uint8_t *states = &registerState[i];
+    // Update state
+    if (i == reg)
+    {
+      bitWrite(*states, actualPin, state);
+    }
+    // Write
+    shiftOut(dataPin, clockPin, MSBFIRST, *states);
+  }
+  digitalWrite(latchPin, HIGH); // End session
+
+  // Agrega println para mostrar el pin encendido
+  Serial.print("Pin ");
+  Serial.print(pin);
+  Serial.print(" is ");
+  Serial.println(state ? "ON" : "OFF");
+}
+
 void setup()
 {
 
-  // pinMode(s0_gnd, OUTPUT);
-  // pinMode(sig_gnd, OUTPUT);
-  // pinMode(sig_vcc, OUTPUT);
-  // pinMode(s0_vcc, OUTPUT);
+  // Initialize array
+  registerState = new uint8_t[numOfRegisters];
+  for (size_t i = 0; i < numOfRegisters; i++)
+  {
+    registerState[i] = 0;
+  }
 
-  // Serial.begin(115200);
-  // Wire.begin(); // Iniciar la comunicación I2C
-  // char str_data[] = {"DOS"};
-  // // eprom.write(0,str_data);
-  //  //gamePiece.writeEEPROM(0,str_data);
-  // // vcc_mux.write(0, HIGH);
-  // delay(100);
-  // digitalWrite(sig_gnd, HIGH); // Configura el pin 23 en HIGH
-  // digitalWrite(s0_gnd, HIGH); // Configura el pin 26 en HIGH
+  // Set all the pins of 74HC595 as OUTPUT
+  pinMode(latchPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+
+  Serial.begin(115200);
+  Wire.begin(); // Iniciar la comunicación I2C
+  Wire.setClock(100000); 
+
+  regWrite(14, HIGH);
+  regWrite(6, HIGH);
+  char str_data[] = {"0000"};
+
+  delay(100);
   // gamePiece.readDataFromEEPROM();
-    strip.begin();
-  strip.show();  // Inicializa todos los LEDs en apagado
+  strip.begin();
+  strip.show();                          // Inicializa todos los LEDs en apagado
+                                         // Ejemplo de cambio de color en todos los LEDs
+  colorWipe(strip.Color(0, 255, 0), 10); // Verde
+
+  leds = 0; // Inicialmente apaga todos los LEDs, dando a la variable 'leds' el valor 0
+
+  delay(500);
 }
 
 void loop()
 {
-    // Ejemplo de cambio de color en todos los LEDs
-  colorWipe(strip.Color(255, 0, 0), 50);  // Rojo
-  delay(500);
-  colorWipe(strip.Color(0, 255, 0), 50);  // Verde
-  delay(500);
-  colorWipe(strip.Color(0, 0, 255), 50);  // Azul
-  delay(500);
-  // //Activamos la columna 0 del mux gnd
-  // digitalWrite(s0_vcc, LOW);
-  // //Energizamos la columna 0 
-  // digitalWrite(sig_vcc, HIGH);
-  // delay(2000);
-  // gamePiece.readDataFromEEPROM();
-  // digitalWrite(sig_vcc, LOW);
-  // //Activamos la columna 1 del mux gnd
-  // digitalWrite(s0_vcc, HIGH);
-  // digitalWrite(sig_vcc, HIGH);
-  // delay(2000);
-  // gamePiece.readDataFromEEPROM(); //LEEMOS otra EEPROM
-  // delay(2000);
+    gamePiece.readDataFromEEPROM();
+    delay(500);
+  // for (int k = 13; k <= 14; k++)
+  // {
+  //   regWrite(k, HIGH);
+  //   gamePiece.readDataFromEEPROM();
+  //   delay(500);
+  //   regWrite(k, LOW);
+  // }
 }

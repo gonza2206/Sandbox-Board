@@ -13,8 +13,8 @@ public:
     void writeEEPROM(unsigned int eeaddress, char *data)
     {
         Wire.beginTransmission(eeprom_addres);
-        Wire.write((byte)(eeaddress >> 8));   // MSB
-        Wire.write((byte)(eeaddress & 0xFF)); // LSB
+        Wire.write((eeaddress >> 8));   // MSB
+        Wire.write((eeaddress & 0xFF)); // LSB
         for (int i = 0; i < strlen(data); i++)
         {
             Wire.write(data[i]);
@@ -30,8 +30,8 @@ public:
 
         // Leer la cadena desde la memoria EEPROM
         Wire.beginTransmission(eeprom_addres);
-        Wire.write((byte)(address >> 8));   // Envía el byte más significativo de la dirección
-        Wire.write((byte)(address & 0xFF)); // Envía el byte menos significativo de la dirección
+        Wire.write((address >> 8));   // Envía el byte más significativo de la dirección
+        Wire.write((address & 0xFF)); // Envía el byte menos significativo de la dirección
         Wire.endTransmission();
 
         Wire.requestFrom(eeprom_addres, 4); // Solicita 4 bytes de datos desde la EEPROM
@@ -43,7 +43,7 @@ public:
             }
             else
             {
-                Serial.println("Error: No se pudo leer la memoria EEPROM.");
+                Serial.println("NO SE ENCONTRO EEPROM...");
                 return;
             }
         }
