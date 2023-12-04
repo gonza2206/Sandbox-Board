@@ -78,10 +78,10 @@ void setup()
 
   Serial.begin(115200);
   Wire.begin(); // Iniciar la comunicación I2C
-  Wire.setClock(100000); 
+  Wire.setClock(10000); 
 
-  regWrite(14, HIGH);
-  regWrite(6, HIGH);
+  //regWrite(14, HIGH);
+  regWrite(15, HIGH);
   char str_data[] = {"0000"};
 
   delay(100);
@@ -98,13 +98,25 @@ void setup()
 
 void loop()
 {
-    gamePiece.readDataFromEEPROM();
-    delay(500);
-  // for (int k = 13; k <= 14; k++)
-  // {
-  //   regWrite(k, HIGH);
-  //   gamePiece.readDataFromEEPROM();
-  //   delay(500);
-  //   regWrite(k, LOW);
-  // }
+  static bool colorSet = false;
+    // gamePiece.readDataFromEEPROM();
+    // delay(500);
+  for (int k = 9; k <= 11; k++)
+  {
+    regWrite(k, HIGH);
+   char* data =  gamePiece.readDataFromEEPROM();
+   // Verifica si la cadena es igual a "DOSR"
+  if (data != nullptr && strcmp(data, "DOSR") == 0 && k == 9 && !colorSet) {
+    strip.setPixelColor(0, strip.Color(255, 255, 0));
+    // Tu código adicional si la cadena es igual a "DOSR"
+        strip.show(); 
+        colorSet = true;
+  } else if (data == nullptr  && k == 9 && colorSet){
+        strip.setPixelColor(0, strip.Color(0, 255, 0));
+    // Tu código adicional si la cadena es igual a "DOSR"
+        strip.show();
+        colorSet = false;
+  }
+    regWrite(k, LOW);
+  }
 }

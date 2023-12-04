@@ -23,35 +23,37 @@ public:
         delay(6); // Necesario para la escritura de página
     }
     
-    void readDataFromEEPROM()
+    char* readDataFromEEPROM()
+{
+    int address = 0; // Dirección de inicio en la EEPROM
+    static char data[5];    // Donde se almacenará la cadena leída
+
+    // Leer la cadena desde la memoria EEPROM
+    Wire.beginTransmission(eeprom_addres);
+    Wire.write((address >> 8));   // Envía el byte más significativo de la dirección
+    Wire.write((address & 0xFF)); // Envía el byte menos significativo de la dirección
+    Wire.endTransmission();
+
+    Wire.requestFrom(eeprom_addres, 4); // Solicita 4 bytes de datos desde la EEPROM
+    for (int i = 0; i < 4; i++)
     {
-        int address = 0; // Dirección de inicio en la EEPROM
-        char data[5];    // Donde se almacenará la cadena leída
-
-        // Leer la cadena desde la memoria EEPROM
-        Wire.beginTransmission(eeprom_addres);
-        Wire.write((address >> 8));   // Envía el byte más significativo de la dirección
-        Wire.write((address & 0xFF)); // Envía el byte menos significativo de la dirección
-        Wire.endTransmission();
-
-        Wire.requestFrom(eeprom_addres, 4); // Solicita 4 bytes de datos desde la EEPROM
-        for (int i = 0; i < 4; i++)
+        if (Wire.available())
         {
-            if (Wire.available())
-            {
-                data[i] = Wire.read(); // Lee los bytes de datos
-            }
-            else
-            {
-                Serial.println("NO SE ENCONTRO EEPROM...");
-                return;
-            }
+            data[i] = Wire.read(); // Lee los bytes de datos
         }
-        data[4] = '\0'; // Agrega un carácter nulo al final para formar una cadena
-
-        Serial.print("Datos leídos: ");
-        Serial.println(data);
+        else
+        {
+            Serial.println("NO SE ENCONTRO EEPROM...");
+            return nullptr; // Cambiado para que la función devuelva un puntero nulo en caso de error
+        }
     }
+    data[4] = '\0'; // Agrega un carácter nulo al final para formar una cadena
+
+    Serial.print("Datos leídos: ");
+    Serial.println(data);
+
+    return data; // Devuelve el puntero al array de datos
+}
 
 private:
     int eeprom_addres;
