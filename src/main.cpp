@@ -8,9 +8,9 @@
 #define NUM_LEDS 30     // Número de LEDs en la tira
 #define NUM_REGISTERS 2 // Número de registros en cascada (puedes ajustarlo según tu configuración)
 
-int latchPin = 14; // pin D8 on NodeMCU boards
+int latchPin = 14; // pin D5 on NodeMCU boards
 int clockPin = 0;  // pin D3 on NodeMCU boards
-int dataPin = 12;  // pin D7 on NodeMCU
+int dataPin = 12;  // pin D6 on NodeMCU
 uint8_t leds = 0;  // Variable to hold the pattern of which LEDs are currently turned on or off
 
 int numOfRegisters = 2;
