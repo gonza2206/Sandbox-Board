@@ -53,12 +53,6 @@ void regWrite(int pin, bool state)
     shiftOut(dataPin, clockPin, MSBFIRST, *states);
   }
   digitalWrite(latchPin, HIGH); // End session
-
-  // Agrega println para mostrar el pin encendido
-  Serial.print("Pin ");
-  Serial.print(pin);
-  Serial.print(" is ");
-  Serial.println(state ? "ON" : "OFF");
 }
 
 void setup()
@@ -78,10 +72,10 @@ void setup()
 
   Serial.begin(115200);
   Wire.begin(); // Iniciar la comunicación I2C
-  Wire.setClock(10000); 
+  Wire.setClock(10000);
 
-  //regWrite(14, HIGH);
-  regWrite(15, HIGH);
+  // regWrite(14, HIGH);
+  regWrite(9, HIGH);
   char str_data[] = {"0000"};
 
   delay(100);
@@ -99,24 +93,31 @@ void setup()
 void loop()
 {
   static bool colorSet = false;
-    // gamePiece.readDataFromEEPROM();
-    // delay(500);
-  for (int k = 9; k <= 11; k++)
+  // gamePiece.readDataFromEEPROM();
+  // delay(500);
+  for (int k = 0; k <= 5; k++)
   {
     regWrite(k, HIGH);
-   char* data =  gamePiece.readDataFromEEPROM();
-   // Verifica si la cadena es igual a "DOSR"
-  if (data != nullptr && strcmp(data, "DOSR") == 0 && k == 9 && !colorSet) {
-    strip.setPixelColor(0, strip.Color(255, 255, 0));
-    // Tu código adicional si la cadena es igual a "DOSR"
-        strip.show(); 
-        colorSet = true;
-  } else if (data == nullptr  && k == 9 && colorSet){
-        strip.setPixelColor(0, strip.Color(0, 255, 0));
-    // Tu código adicional si la cadena es igual a "DOSR"
-        strip.show();
-        colorSet = false;
-  }
+    for (uint8_t i = 8; i <= 15; i++)
+    {
+      regWrite(i, HIGH);
+      char *data = gamePiece.readDataFromEEPROM();
+      delay(20);
+      regWrite(i, LOW);
+    }
+    //  // Verifica si la cadena es igual a "DOSR"
+    // if (data != nullptr && strcmp(data, "DOSR") == 0 && !colorSet) {
+    //   strip.setPixelColor(0, strip.Color(255, 255, 0));
+    //   // Tu código adicional si la cadena es igual a "DOSR"
+    //       strip.show();
+    //       colorSet = true;
+    // } else if (data == nullptr  && k == 9 && colorSet){
+    //       strip.setPixelColor(0, strip.Color(0, 255, 0));
+    //   // Tu código adicional si la cadena es igual a "DOSR"
+    //       strip.show();
+    //       colorSet = false;
+    // }
+    delay(100);
     regWrite(k, LOW);
   }
 }
