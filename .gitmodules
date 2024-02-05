@@ -1,0 +1,3 @@
+[submodule "lib/EEPROM-manager"]
+	path = lib/EEPROM-manager
+	url = git@github.com:gonza2206/EEPROM-manager.git
